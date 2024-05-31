@@ -1,21 +1,31 @@
-from flask import Flask, request, jsonify
+import streamlit as st
+import requests
+import pandas as pd
+import time
 
-app = Flask(__name__)
+st.title('Monitor de Temperatura y Humedad')
 
-data = {
-    "temperature": 0,
-    "humidity": 0
-}
+temperature = st.empty()
+humidity = st.empty()
+chart_data = st.empty()
 
-@app.route('/data', methods=['POST'])
-def receive_data():
-    global data
-    data = request.json
-    return jsonify({"status": "success"}), 200
+data_points = []
 
-@app.route('/data', methods=['GET'])
-def send_data():
-    return jsonify(data), 200
+def get_data():
+    response = requests.get('http://')  
+    return response.json()
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+while True:
+    data = get_data()
+    temp = data['temperature']
+    hum = data['humidity']
+
+    temperature.metric("Temperatura", f"{temp} °C")
+    humidity.metric("Humedad", f"{hum} %")
+
+    data_points.append([time.time(), temp, hum])
+    df = pd.DataFrame(data_points, columns=['Time', 'Temperature', 'Humidity'])
+
+    chart_data.line_chart(df.set_index('Time'))
+
+    time.sleep(2)

@@ -12,7 +12,7 @@ chart_data = st.empty()
 data_points = []
 
 def get_data():
-    response = requests.get('http://')  
+    response = requests.get('https://wokwi.com/projects/399355596323807233')  
     return response.json()
 
 while True:
